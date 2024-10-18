@@ -4,11 +4,9 @@ This project is a Task Management API built with Node.js, Express, and MongoDB. 
 
 ## Features
 
-- **Create Tasks**: Users and admins can create new tasks.
-- **Get All Tasks**: Retrieve a list of all tasks.
-- **Get Task by ID**: Fetch a specific task by its ID.
-- **Update Tasks**: Admins can update existing tasks.
-- **Delete Tasks**: Admins can delete tasks.
+- **Create/Get/Update/Delete Projects**: Admins can manage projects.
+- **Create/Get/Update/Delete Tasks**:  Admins can manage tasks.
+- **Create/Get/Update Tasks**: Users can manage tasks based on their permissions.
 
 ## Technologies Used
 
