@@ -1,0 +1,727 @@
+{
+	"info": {
+		"_postman_id": "ac52b469-4f5a-432d-854a-4ec8ef9ad273",
+		"name": "TaskManagement",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25186259"
+	},
+	"item": [
+		{
+			"name": "Projects",
+			"item": [
+				{
+					"name": "CreateProject",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const authToken = pm.environment.get(\"authToken\");",
+									"pm.request.headers.add({",
+									"    key: \"Authorization\",",
+									"    value: \"Bearer \" + authToken,",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"My First Project 1\",\n    \"description\": \"This is a test project 1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5003/api/projects",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5003",
+							"path": [
+								"api",
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetProjects",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const authToken = pm.environment.get(\"authToken\");",
+									"pm.request.headers.add({",
+									"    key: \"Authorization\",",
+									"    value: \"Bearer \" + authToken,",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5003/api/projects",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5003",
+							"path": [
+								"api",
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetProjectsById",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const authToken = pm.environment.get(\"authToken\");",
+									"pm.request.headers.add({",
+									"    key: \"Authorization\",",
+									"    value: \"Bearer \" + authToken,",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5003/api/projects/671258d7c82bf88deeb42b76",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5003",
+							"path": [
+								"api",
+								"projects",
+								"671258d7c82bf88deeb42b76"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateProjectById",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const authToken = pm.environment.get(\"authToken\");",
+									"pm.request.headers.add({",
+									"    key: \"Authorization\",",
+									"    value: \"Bearer \" + authToken,",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Project10\",\n    \"description\": \"Project1 Description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5003/api/projects/671258d7c82bf88deeb42b76",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5003",
+							"path": [
+								"api",
+								"projects",
+								"671258d7c82bf88deeb42b76"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteProjectsById",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const authToken = pm.environment.get(\"authToken\");",
+									"pm.request.headers.add({",
+									"    key: \"Authorization\",",
+									"    value: \"Bearer \" + authToken,",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5003/api/projects/671258d7c82bf88deeb42b76",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5003",
+							"path": [
+								"api",
+								"projects",
+								"671258d7c82bf88deeb42b76"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tasks",
+			"item": [
+				{
+					"name": "CreateTask",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const authToken = pm.environment.get(\"authToken\");",
+									"pm.request.headers.add({",
+									"    key: \"Authorization\",",
+									"    value: \"Bearer \" + authToken,",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"My First Task 1\",\n    \"description\": \"This is a test task 1\",\n    \"status\":\"todo\",\n    \"projectId\":\"67125994ab110de347ca0bb\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5003/api/tasks",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5003",
+							"path": [
+								"api",
+								"tasks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetTasks",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const authToken = pm.environment.get(\"authToken\");",
+									"pm.request.headers.add({",
+									"    key: \"Authorization\",",
+									"    value: \"Bearer \" + authToken,",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5003/api/tasks",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5003",
+							"path": [
+								"api",
+								"tasks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetTaskById",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const authToken = pm.environment.get(\"authToken\");",
+									"pm.request.headers.add({",
+									"    key: \"Authorization\",",
+									"    value: \"Bearer \" + authToken,",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5003/api/tasks/671145ba22df7d29305bd646",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5003",
+							"path": [
+								"api",
+								"tasks",
+								"671145ba22df7d29305bd646"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateTasksById",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const authToken = pm.environment.get(\"authToken\");",
+									"pm.request.headers.add({",
+									"    key: \"Authorization\",",
+									"    value: \"Bearer \" + authToken,",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Project1 Task1\",\n    \"description\": \"This is task 1 for project 1\",\n    \"status\":\"done\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5003/api/tasks/671145ba22df7d29305bd646",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5003",
+							"path": [
+								"api",
+								"tasks",
+								"671145ba22df7d29305bd646"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteTasksById",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const authToken = pm.environment.get(\"authToken\");",
+									"pm.request.headers.add({",
+									"    key: \"Authorization\",",
+									"    value: \"Bearer \" + authToken,",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5003/api/tasks/671257b1c6a2d12fa8383531",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5003",
+							"path": [
+								"api",
+								"tasks",
+								"671257b1c6a2d12fa8383531"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"pm.collectionVariables.set(\"authToken\", jsonData.token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"Admin1234!\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5003/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5003",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Admin",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"Admin1234!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5003/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5003",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				},
+				{
+					"name": "User",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"user\",\n    \"password\": \"User1234!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5003/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5003",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				},
+				{
+					"name": "First login",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"username\",\n    \"password\": \"password\",\n    \"newPassword\":\"newPassword\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5003/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5003",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"_postman_previewlanguage": null,
+					"header": null,
+					"cookie": [],
+					"body": null
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
