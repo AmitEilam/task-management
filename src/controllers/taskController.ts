@@ -31,7 +31,11 @@ export const getAllTasks = async (
 ): Promise<void> => {
   try {
     const tasks = await Task.find();
-    res.status(200).json(tasks);
+    if (tasks.length === 0) {
+      res.status(404).json({ message: 'No tasks found' });
+    } else {
+      res.status(200).json(tasks);
+    }
   } catch (error) {
     const errorMessage = (error as Error).message || 'Unknown error';
     res
