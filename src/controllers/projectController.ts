@@ -1,8 +1,18 @@
 import { Request, Response } from 'express';
 import Project from '../models/Project';
+import Task from '../models/Task';
 
-// CREATE a new project
+// פונקציה לבדוק אם המשתמש הוא admin
+const isAdmin = (req: Request): boolean => {
+  return (req as any).user?.groups?.includes('admin');
+};
+
+// CREATE a new project (admin only)
 export const createProject = (req: Request, res: Response) => {
+  if (!isAdmin(req)) {
+    return res.status(403).json({ message: 'Access denied: Admins only' });
+  }
+
   const { name, description } = req.body;
   const project = new Project({ name, description });
 
@@ -21,8 +31,12 @@ export const createProject = (req: Request, res: Response) => {
     });
 };
 
-// READ ALL projects
+// READ ALL projects (admin only)
 export const getAllProjects = (req: Request, res: Response) => {
+  if (!isAdmin(req)) {
+    return res.status(403).json({ message: 'Access denied: Admins only' });
+  }
+
   Project.find()
     .then((projects) => {
       if (projects.length === 0) {
@@ -38,8 +52,12 @@ export const getAllProjects = (req: Request, res: Response) => {
     });
 };
 
-// READ ONE project by ID
+// READ ONE project by ID (admin only)
 export const getProjectById = (req: Request, res: Response) => {
+  if (!isAdmin(req)) {
+    return res.status(403).json({ message: 'Access denied: Admins only' });
+  }
+
   Project.findById(req.params.id)
     .then((project) => {
       if (!project) {
@@ -55,8 +73,12 @@ export const getProjectById = (req: Request, res: Response) => {
     });
 };
 
-// UPDATE a project by ID
+// UPDATE a project by ID (admin only)
 export const updateProject = (req: Request, res: Response) => {
+  if (!isAdmin(req)) {
+    return res.status(403).json({ message: 'Access denied: Admins only' });
+  }
+
   Project.findByIdAndUpdate(req.params.id, req.body, { new: true })
     .then((project) => {
       if (!project) {
@@ -74,14 +96,33 @@ export const updateProject = (req: Request, res: Response) => {
     });
 };
 
-// DELETE a project by ID
+// DELETE a project by ID (admin only)
 export const deleteProject = (req: Request, res: Response) => {
+  if (!isAdmin(req)) {
+    return res.status(403).json({ message: 'Access denied: Admins only' });
+  }
+
   Project.findByIdAndDelete(req.params.id)
     .then((project) => {
       if (!project) {
         return res.status(404).json({ message: 'Project not found' });
       }
-      res.status(200).json({ message: 'Project deleted successfully' });
+
+      // מחיקת כל המשימות שקשורות לפרויקט
+      Task.deleteMany({ projectId: req.params.id })
+        .then(() => {
+          res.status(200).json({
+            message: 'Project and related tasks deleted successfully',
+          });
+        })
+        .catch((error: unknown) => {
+          const errorMessage =
+            (error as Error).message || 'Error deleting related tasks';
+          res.status(500).json({
+            message: 'Error deleting related tasks',
+            error: errorMessage,
+          });
+        });
     })
     .catch((error: unknown) => {
       const errorMessage = (error as Error).message || 'Unknown error';

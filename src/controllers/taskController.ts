@@ -1,7 +1,12 @@
 import { Request, Response } from 'express';
 import Task from '../models/Task';
 
-// CREATE a new task
+// פונקציה לבדוק אם המשתמש הוא admin
+const isAdmin = (req: Request): boolean => {
+  return (req as any).user?.groups?.includes('admin');
+};
+
+// CREATE a new task (users and admins can create)
 export const createTask = (req: Request, res: Response) => {
   const { title, description, status, projectId } = req.body;
   const task = new Task({ title, description, status, projectId });
@@ -21,7 +26,7 @@ export const createTask = (req: Request, res: Response) => {
     });
 };
 
-// READ ALL tasks
+// READ ALL tasks (users and admins can read)
 export const getAllTasks = (req: Request, res: Response) => {
   Task.find()
     .then((tasks) => {
@@ -35,7 +40,7 @@ export const getAllTasks = (req: Request, res: Response) => {
     });
 };
 
-// READ ONE task by ID
+// READ ONE task by ID (users and admins can read)
 export const getTaskById = (req: Request, res: Response) => {
   Task.findById(req.params.id)
     .then((task) => {
@@ -52,7 +57,7 @@ export const getTaskById = (req: Request, res: Response) => {
     });
 };
 
-// UPDATE a task by ID
+// UPDATE a task by ID (users and admins can update)
 export const updateTask = (req: Request, res: Response) => {
   const validStatuses = ['todo', 'in-progress', 'done'];
   Task.findByIdAndUpdate(req.params.id, req.body, { new: true })
@@ -77,8 +82,12 @@ export const updateTask = (req: Request, res: Response) => {
     });
 };
 
-// DELETE a task by ID
+// DELETE a task by ID (only admins can delete)
 export const deleteTask = (req: Request, res: Response) => {
+  if (!isAdmin(req)) {
+    return res.status(403).json({ message: 'Access denied: Admins only' });
+  }
+
   Task.findByIdAndDelete(req.params.id)
     .then((task) => {
       if (!task) {
