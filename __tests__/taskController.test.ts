@@ -6,7 +6,7 @@ import {
   deleteTask,
 } from '../src/controllers/taskController';
 import Task from '../src/models/Task';
-import Project from '../src/models/Project'; // Importing the Project model
+import Project from '../src/models/Project';
 
 // Mocking the Task and Project models
 jest.mock('../src/models/Task');
@@ -14,12 +14,12 @@ jest.mock('../src/models/Project');
 
 describe('Task Controller', () => {
   let mockTask: any;
-  let mockProject: any; // Variable for mocked Project
+  let mockProject: any;
 
   // Initialize mocks before each test
   beforeEach(() => {
     mockTask = Task;
-    mockProject = Project; // Assign the mocked Project model
+    mockProject = Project;
   });
 
   // Clear mocks after each test to ensure a clean state
@@ -36,6 +36,7 @@ describe('Task Controller', () => {
           status: 'todo',
           projectId: 'project123',
         },
+        user: { userId: 'user123' },
       } as any;
 
       const res = {
@@ -47,7 +48,7 @@ describe('Task Controller', () => {
       mockProject.findById = jest.fn().mockResolvedValue({ _id: 'project123' });
 
       // Mock the save function to simulate saving a task
-      const savedTask = { ...req.body, _id: 'task123' };
+      const savedTask = { ...req.body, _id: 'task123', userId: 'user123' };
       mockTask.prototype.save = jest.fn().mockResolvedValue(savedTask);
 
       await createTask(req, res);
@@ -68,6 +69,7 @@ describe('Task Controller', () => {
           status: 'todo',
           projectId: 'project123',
         },
+        user: { userId: 'user123' },
       } as any;
 
       const res = {
@@ -91,8 +93,9 @@ describe('Task Controller', () => {
           title: 'Test Task',
           description: 'Test Description',
           status: 'todo',
-          projectId: 'project123', // Use a valid project ID here for the test
+          projectId: 'project123',
         },
+        user: { userId: 'user123' },
       } as any;
 
       const res = {
@@ -120,26 +123,33 @@ describe('Task Controller', () => {
   });
 
   describe('getAllTasks', () => {
-    it('should return all tasks with 200 status', async () => {
-      const req = {} as any;
+    it('should return all tasks associated with the user', async () => {
+      const req = {
+        user: { userId: 'user123' },
+      } as any;
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       } as any;
 
-      // Mock the response to return a list of tasks
-      const tasks = [{ title: 'Task 1' }, { title: 'Task 2' }];
+      // Mock the response to return a list of tasks for the user
+      const tasks = [
+        { title: 'Task 1', userId: 'user123' },
+        { title: 'Task 2', userId: 'user123' },
+      ];
       mockTask.find = jest.fn().mockResolvedValue(tasks);
 
       await getAllTasks(req, res);
 
-      // Check if response is correct
+      // Verify that the response status and tasks are correct
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(tasks);
     });
 
     it('should return 500 if fetching tasks fails', async () => {
-      const req = {} as any;
+      const req = {
+        user: { userId: 'user123' },
+      } as any;
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
@@ -159,16 +169,19 @@ describe('Task Controller', () => {
   });
 
   describe('getTaskById', () => {
-    it('should return a task with 200 status', async () => {
-      const req = { params: { id: 'task123' } } as any;
+    it('should return a task associated with the user', async () => {
+      const req = {
+        params: { id: 'task123' },
+        user: { userId: 'user123' },
+      } as any;
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       } as any;
 
       // Mock a specific task being returned
-      const task = { title: 'Test Task' };
-      mockTask.findById = jest.fn().mockResolvedValue(task);
+      const task = { title: 'Test Task', userId: 'user123' };
+      mockTask.findOne = jest.fn().mockResolvedValue(task);
 
       await getTaskById(req, res);
 
@@ -177,14 +190,17 @@ describe('Task Controller', () => {
     });
 
     it('should return 404 if task not found', async () => {
-      const req = { params: { id: 'task123' } } as any;
+      const req = {
+        params: { id: 'task123' },
+        user: { userId: 'user123' },
+      } as any;
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       } as any;
 
       // Simulate a scenario where the task is not found
-      mockTask.findById = jest.fn().mockResolvedValue(null);
+      mockTask.findOne = jest.fn().mockResolvedValue(null);
 
       await getTaskById(req, res);
 
@@ -198,6 +214,7 @@ describe('Task Controller', () => {
       const req = {
         params: { id: 'task123' },
         body: { status: 'in-progress' },
+        user: { userId: 'user123' },
       } as any;
 
       const res = {
@@ -206,8 +223,12 @@ describe('Task Controller', () => {
       } as any;
 
       // Mock the update function to return an updated task
-      const updatedTask = { title: 'Test Task', status: 'in-progress' };
-      mockTask.findByIdAndUpdate = jest.fn().mockResolvedValue(updatedTask);
+      const updatedTask = {
+        title: 'Test Task',
+        status: 'in-progress',
+        userId: 'user123',
+      };
+      mockTask.findOneAndUpdate = jest.fn().mockResolvedValue(updatedTask);
 
       await updateTask(req, res);
 
@@ -222,6 +243,7 @@ describe('Task Controller', () => {
       const req = {
         params: { id: 'task123' },
         body: { status: 'in-progress' },
+        user: { userId: 'user123' }, // Simulate user ID
       } as any;
 
       const res = {
@@ -230,7 +252,7 @@ describe('Task Controller', () => {
       } as any;
 
       // Simulate a scenario where the task is not found during update
-      mockTask.findByIdAndUpdate = jest.fn().mockResolvedValue(null);
+      mockTask.findOneAndUpdate = jest.fn().mockResolvedValue(null);
 
       await updateTask(req, res);
 
@@ -265,7 +287,7 @@ describe('Task Controller', () => {
     it('should return 403 if user is not admin', async () => {
       const req = {
         params: { id: 'task123' },
-        user: { groups: ['user'] }, // Simulate regular user
+        user: { groups: ['user'] },
       } as any;
 
       const res = {

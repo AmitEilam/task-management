@@ -16,7 +16,7 @@ describe('Project Controller', () => {
 
   // Initialize mockProject before each test
   beforeEach(() => {
-    mockProject = Project; // Assigning the mocked Project model to mockProject
+    mockProject = Project;
   });
 
   // Clear mocks after each test to ensure a clean state
@@ -31,7 +31,7 @@ describe('Project Controller', () => {
           name: 'Test Project',
           description: 'Test Description',
         },
-        user: { groups: ['admin'] }, // Simulate admin user
+        user: { groups: ['admin'], userId: 'user123' },
       } as any;
 
       const res = {
@@ -40,7 +40,11 @@ describe('Project Controller', () => {
       } as any;
 
       // Mock the save function to simulate saving a project
-      const savedProject = { ...req.body, _id: 'project123' };
+      const savedProject = {
+        ...req.body,
+        _id: 'project123',
+        userId: req.user.userId,
+      };
       mockProject.prototype.save = jest.fn().mockResolvedValue(savedProject);
 
       await createProject(req, res);
@@ -59,7 +63,7 @@ describe('Project Controller', () => {
           name: 'Test Project',
           description: 'Test Description',
         },
-        user: { groups: ['user'] }, // Simulate regular user
+        user: { groups: ['user'], userId: 'user123' },
       } as any;
 
       const res = {
@@ -82,7 +86,7 @@ describe('Project Controller', () => {
           name: 'Test Project',
           description: 'Test Description',
         },
-        user: { groups: ['admin'] }, // Simulate admin user
+        user: { groups: ['admin'], userId: 'user123' },
       } as any;
 
       const res = {
@@ -107,16 +111,26 @@ describe('Project Controller', () => {
   });
 
   describe('getAllProjects', () => {
-    it('should return all projects with 200 status for admin', async () => {
-      const req = { user: { groups: ['admin'] } } as any;
+    it('should return all projects associated with the user', async () => {
+      const req = {
+        user: { groups: ['admin'], userId: 'user123' },
+      } as any;
+
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       } as any;
 
-      // Mock the response to return a list of projects
-      const projects = [{ name: 'Project 1' }, { name: 'Project 2' }];
-      mockProject.find = jest.fn().mockResolvedValue(projects);
+      // Mock the response to return a list of projects for the user
+      const projects = [
+        { name: 'Project 1', userId: 'user123' },
+        { name: 'Project 2', userId: 'user123' },
+      ];
+      mockProject.find = jest
+        .fn()
+        .mockResolvedValue(
+          projects.filter((p) => p.userId === req.user.userId)
+        );
 
       await getAllProjects(req, res);
 
@@ -125,24 +139,8 @@ describe('Project Controller', () => {
       expect(res.json).toHaveBeenCalledWith(projects);
     });
 
-    it('should return 403 if user is not admin', async () => {
-      const req = { user: { groups: ['user'] } } as any;
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as any;
-
-      await getAllProjects(req, res);
-
-      // Verify that the response status and message are correct for non-admin
-      expect(res.status).toHaveBeenCalledWith(403);
-      expect(res.json).toHaveBeenCalledWith({
-        message: 'Access denied: Admins only',
-      });
-    });
-
     it('should return 500 if fetching projects fails', async () => {
-      const req = { user: { groups: ['admin'] } } as any;
+      const req = { user: { groups: ['admin'], userId: 'user123' } } as any;
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
@@ -163,18 +161,18 @@ describe('Project Controller', () => {
   });
 
   describe('getProjectById', () => {
-    it('should return a project with 200 status for admin', async () => {
+    it('should return a project associated with the user', async () => {
       const req = {
         params: { id: 'project123' },
-        user: { groups: ['admin'] },
+        user: { groups: ['admin'], userId: 'user123' },
       } as any;
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       } as any;
 
-      const project = { name: 'Test Project' };
-      mockProject.findById = jest.fn().mockResolvedValue(project);
+      const project = { name: 'Test Project', userId: 'user123' };
+      mockProject.findOne = jest.fn().mockResolvedValue(project);
 
       await getProjectById(req, res);
 
@@ -186,7 +184,7 @@ describe('Project Controller', () => {
     it('should return 403 if user is not admin', async () => {
       const req = {
         params: { id: 'project123' },
-        user: { groups: ['user'] },
+        user: { groups: ['user'], userId: 'user123' },
       } as any;
       const res = {
         status: jest.fn().mockReturnThis(),
@@ -205,14 +203,14 @@ describe('Project Controller', () => {
     it('should return 404 if project not found', async () => {
       const req = {
         params: { id: 'project123' },
-        user: { groups: ['admin'] },
+        user: { groups: ['admin'], userId: 'user123' },
       } as any;
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       } as any;
 
-      mockProject.findById = jest.fn().mockResolvedValue(null);
+      mockProject.findOne = jest.fn().mockResolvedValue(null);
 
       await getProjectById(req, res);
 
@@ -227,7 +225,7 @@ describe('Project Controller', () => {
       const req = {
         params: { id: 'project123' },
         body: { name: 'Updated Project' },
-        user: { groups: ['admin'] },
+        user: { groups: ['admin'], userId: 'user123' },
       } as any;
 
       const res = {
@@ -235,8 +233,8 @@ describe('Project Controller', () => {
         json: jest.fn(),
       } as any;
 
-      const updatedProject = { name: 'Updated Project' };
-      mockProject.findByIdAndUpdate = jest
+      const updatedProject = { name: 'Updated Project', userId: 'user123' };
+      mockProject.findOneAndUpdate = jest
         .fn()
         .mockResolvedValue(updatedProject);
 
@@ -254,7 +252,7 @@ describe('Project Controller', () => {
       const req = {
         params: { id: 'project123' },
         body: { name: 'Updated Project' },
-        user: { groups: ['user'] },
+        user: { groups: ['user'], userId: 'user123' },
       } as any;
 
       const res = {
@@ -275,7 +273,7 @@ describe('Project Controller', () => {
       const req = {
         params: { id: 'project123' },
         body: { name: 'Updated Project' },
-        user: { groups: ['admin'] },
+        user: { groups: ['admin'], userId: 'user123' },
       } as any;
 
       const res = {
@@ -283,7 +281,7 @@ describe('Project Controller', () => {
         json: jest.fn(),
       } as any;
 
-      mockProject.findByIdAndUpdate = jest.fn().mockResolvedValue(null);
+      mockProject.findOneAndUpdate = jest.fn().mockResolvedValue(null);
 
       await updateProject(req, res);
 
@@ -297,7 +295,7 @@ describe('Project Controller', () => {
     it('should delete a project and return 200 status for admin', async () => {
       const req = {
         params: { id: 'project123' },
-        user: { groups: ['admin'] },
+        user: { groups: ['admin'], userId: 'user123' },
       } as any;
 
       const res = {
@@ -306,9 +304,9 @@ describe('Project Controller', () => {
       } as any;
 
       // Mock the delete function to simulate the project being found and deleted
-      mockProject.findByIdAndDelete = jest
+      mockProject.findOneAndDelete = jest
         .fn()
-        .mockResolvedValue({ _id: 'project123' }); // Simulate project found
+        .mockResolvedValue({ _id: 'project123', userId: 'user123' });
 
       // Mock the deleteMany function to simulate successful deletion of related tasks
       Task.deleteMany = jest.fn().mockResolvedValue({ deletedCount: 1 });
@@ -325,7 +323,7 @@ describe('Project Controller', () => {
     it('should return 403 if user is not admin', async () => {
       const req = {
         params: { id: 'project123' },
-        user: { groups: ['user'] },
+        user: { groups: ['user'], userId: 'user123' },
       } as any;
 
       const res = {
@@ -345,7 +343,7 @@ describe('Project Controller', () => {
     it('should return 404 if project not found', async () => {
       const req = {
         params: { id: 'project123' },
-        user: { groups: ['admin'] },
+        user: { groups: ['admin'], userId: 'user123' },
       } as any;
 
       const res = {
@@ -354,7 +352,7 @@ describe('Project Controller', () => {
       } as any;
 
       // Simulate a scenario where the project is not found
-      mockProject.findByIdAndDelete = jest.fn().mockResolvedValue(null);
+      mockProject.findOneAndDelete = jest.fn().mockResolvedValue(null);
 
       await deleteProject(req, res);
 

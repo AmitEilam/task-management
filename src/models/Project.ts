@@ -4,12 +4,14 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IProject extends Document {
   name: string;
   description: string;
+  userId: string;
 }
 
 // Creating a schema for the Project model
 const projectSchema: Schema = new Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
+  userId: { type: String, required: true },
 });
 
 // Creating the Project model using the schema and the IProject interface

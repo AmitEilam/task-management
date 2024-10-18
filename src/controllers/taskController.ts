@@ -14,19 +14,20 @@ export const createTask = async (
 ): Promise<void> => {
   try {
     const { title, description, status, projectId } = req.body;
+    const userId = (req as any).user.userId;
 
     // Check if the project exists
     const project = await Project.findById(projectId);
     if (!project) {
       // Send a 404 response if the project does not exist
       res.status(404).json({ message: 'Project not found' });
-    } else {
-      const task = new Task({ title, description, status, projectId });
-      await task.save();
-      res
-        .status(201)
-        .json({ message: 'Task created successfully', data: task });
+      return; // Ensure to return after sending a response
     }
+
+    // Create the task with the provided projectId and the userId of the current user
+    const task = new Task({ title, description, status, projectId, userId });
+    await task.save();
+    res.status(201).json({ message: 'Task created successfully', data: task });
   } catch (error) {
     const errorMessage = (error as Error).message || 'Unknown error';
     res
@@ -41,7 +42,8 @@ export const getAllTasks = async (
   res: Response
 ): Promise<void> => {
   try {
-    const tasks = await Task.find();
+    const userId = (req as any).user.userId; // Get userId from the request
+    const tasks = await Task.find({ userId }); // Fetch tasks associated with the user
     if (tasks.length === 0) {
       res.status(404).json({ message: 'No tasks found' });
     } else {
@@ -61,7 +63,8 @@ export const getTaskById = async (
   res: Response
 ): Promise<void> => {
   try {
-    const task = await Task.findById(req.params.id);
+    const userId = (req as any).user.userId;
+    const task = await Task.findOne({ _id: req.params.id, userId });
     if (!task) {
       res.status(404).json({ message: 'Task not found' });
     } else {
@@ -82,9 +85,12 @@ export const updateTask = async (
 ): Promise<void> => {
   try {
     const validStatuses = ['todo', 'in-progress', 'done'];
-    const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const userId = (req as any).user.userId;
+    const task = await Task.findOneAndUpdate(
+      { _id: req.params.id, userId },
+      req.body,
+      { new: true }
+    );
 
     if (!task) {
       res.status(404).json({ message: 'Task not found' });

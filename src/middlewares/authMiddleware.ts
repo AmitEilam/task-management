@@ -31,18 +31,16 @@ export const authMiddleware = async (
       }
 
       // Ensuring that decoded is not a string and contains the expected property
-      if (
-        typeof decoded !== 'string' &&
-        decoded &&
-        'cognito:groups' in decoded
-      ) {
+      if (typeof decoded !== 'string' && decoded) {
         // Adding user groups to the request object
         (req as any).user = {
           groups: (decoded as JwtPayload)['cognito:groups'] || [],
+          userId: (decoded as JwtPayload)['sub'],
         };
       }
 
-      next(); // Proceeding to the next middleware or route handler
+      // Proceeding to the next middleware or route handler
+      next();
     });
   } catch (error) {
     res.status(403).json({ message: 'Token is invalid or expired' });

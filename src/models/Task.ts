@@ -6,6 +6,7 @@ export interface ITask extends Document {
   description: string;
   status: 'todo' | 'in-progress' | 'done';
   projectId: string;
+  userId: string;
 }
 
 // Creating a schema for the Task model
@@ -18,6 +19,7 @@ const taskSchema: Schema = new Schema({
     required: true,
   },
   projectId: { type: String, required: true },
+  userId: { type: String, required: true },
 });
 
 // Creating the Task model using the schema and the ITask interface

@@ -19,7 +19,8 @@ export const createProject = async (
 
   try {
     const { name, description } = req.body;
-    const project = new Project({ name, description });
+    const userId = (req as any).user.userId;
+    const project = new Project({ name, description, userId });
     await project.save();
     res
       .status(201)
@@ -37,13 +38,9 @@ export const getAllProjects = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  if (!isAdmin(req)) {
-    res.status(403).json({ message: 'Access denied: Admins only' });
-    return;
-  }
-
   try {
-    const projects = await Project.find();
+    const userId = (req as any).user.userId;
+    const projects = await Project.find({ userId });
     if (projects.length === 0) {
       res.status(404).json({ message: 'No projects found' });
     } else {
@@ -68,7 +65,8 @@ export const getProjectById = async (
   }
 
   try {
-    const project = await Project.findById(req.params.id);
+    const userId = (req as any).user.userId;
+    const project = await Project.findOne({ _id: req.params.id, userId });
     if (!project) {
       res.status(404).json({ message: 'Project not found' });
     } else {
@@ -93,9 +91,12 @@ export const updateProject = async (
   }
 
   try {
-    const project = await Project.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const userId = (req as any).user.userId;
+    const project = await Project.findOneAndUpdate(
+      { _id: req.params.id, userId },
+      req.body,
+      { new: true }
+    );
     if (!project) {
       res.status(404).json({ message: 'Project not found' });
     } else {
@@ -122,11 +123,15 @@ export const deleteProject = async (
   }
 
   try {
-    const project = await Project.findByIdAndDelete(req.params.id);
+    const userId = (req as any).user.userId;
+    const project = await Project.findOneAndDelete({
+      _id: req.params.id,
+      userId,
+    }); // Find and delete the project by ID and userId
     if (!project) {
       res.status(404).json({ message: 'Project not found' });
     } else {
-      await Task.deleteMany({ projectId: req.params.id }); // מחיקת כל המשימות שקשורות לפרויקט
+      await Task.deleteMany({ projectId: req.params.id });
       res
         .status(200)
         .json({ message: 'Project and related tasks deleted successfully' });
