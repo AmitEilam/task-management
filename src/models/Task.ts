@@ -1,27 +1,26 @@
-import mongoose, { Document, Schema } from 'mongoose'; // Importing mongoose and its types for creating schemas and documents
+import mongoose, { Document, Schema } from 'mongoose';
 
 // Defining an interface for the Task model that extends mongoose Document
 export interface ITask extends Document {
-  title: string; // Title of the task
-  description: string; // Description of the task
-  status: 'todo' | 'in-progress' | 'done'; // Status of the task with specific allowed values
-  projectId: string; // ID of the project to which the task belongs
+  title: string;
+  description: string;
+  status: 'todo' | 'in-progress' | 'done';
+  projectId: string;
 }
 
 // Creating a schema for the Task model
 const taskSchema: Schema = new Schema({
-  title: { type: String, required: true }, // Title field, required
-  description: { type: String, required: true }, // Description field, required
+  title: { type: String, required: true },
+  description: { type: String, required: true },
   status: {
-    type: String, // Status field
-    enum: ['todo', 'in-progress', 'done'], // Allowed values for the status
-    required: true, // This field is required
+    type: String,
+    enum: ['todo', 'in-progress', 'done'],
+    required: true,
   },
-  projectId: { type: String, required: true }, // Project ID field, required
+  projectId: { type: String, required: true },
 });
 
 // Creating the Task model using the schema and the ITask interface
 const Task = mongoose.model<ITask>('Task', taskSchema);
 
-// Exporting the Task model for use in other parts of the application
 export default Task;

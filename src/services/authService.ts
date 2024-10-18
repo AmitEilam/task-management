@@ -4,73 +4,72 @@ import {
   AdminInitiateAuthCommandInput,
   AdminSetUserPasswordCommand,
   AdminSetUserPasswordCommandInput,
-} from '@aws-sdk/client-cognito-identity-provider'; // Importing necessary components from AWS SDK
-import dotenv from 'dotenv'; // Importing dotenv to manage environment variables
+} from '@aws-sdk/client-cognito-identity-provider';
+import dotenv from 'dotenv';
 
-dotenv.config(); // Loading environment variables from .env file
+// Load environment variables
+dotenv.config();
 
 // Creating an instance of Cognito service
 const cognitoClient = new CognitoIdentityProviderClient({
-  region: process.env.AWS_REGION, // AWS region
+  region: process.env.AWS_REGION,
 });
 
 // Function to log in a user
 export const loginUser = async (
   username: string,
   password: string,
-  newPassword?: string // Optional parameter for new password if required
+  newPassword?: string // Optional parameter for new password
 ) => {
-  // Define the params with the correct type for AuthFlow
   const params: AdminInitiateAuthCommandInput = {
-    AuthFlow: 'ADMIN_NO_SRP_AUTH', // Specify the auth flow type
-    ClientId: process.env.COGNITO_CLIENT_ID!, // Client ID of the Cognito user pool
-    UserPoolId: process.env.COGNITO_USER_POOL_ID!, // User pool ID
+    // Admin authentication flow
+    AuthFlow: 'ADMIN_NO_SRP_AUTH',
+    ClientId: process.env.COGNITO_CLIENT_ID!,
+    UserPoolId: process.env.COGNITO_USER_POOL_ID!,
     AuthParameters: {
-      USERNAME: username, // Username for authentication
-      PASSWORD: password, // Password for authentication
+      USERNAME: username,
+      PASSWORD: password,
     },
   };
 
   try {
-    const command = new AdminInitiateAuthCommand(params); // Preparing the command
-    const response = await cognitoClient.send(command); // Initiating authentication
+    const command = new AdminInitiateAuthCommand(params);
+    const response = await cognitoClient.send(command);
 
-    // Check if a new password is required
+    // Handle new password challenge
     if (response.ChallengeName === 'NEW_PASSWORD_REQUIRED') {
-      // If a new password is required, check if it's provided
       if (!newPassword) {
-        throw new Error(
-          'New password must be provided for change password challenge.' // Error if new password is not provided
-        );
+        throw new Error('New password must be provided.');
       }
 
-      // Changing the password to the new one
+      // Change password to new one
       const changePasswordParams: AdminSetUserPasswordCommandInput = {
-        UserPoolId: process.env.COGNITO_USER_POOL_ID!, // User pool ID
-        Username: username, // Username for which to change the password
-        Password: newPassword, // New password
-        Permanent: true, // Make the new password permanent
+        UserPoolId: process.env.COGNITO_USER_POOL_ID!,
+        Username: username,
+        Password: newPassword,
+        Permanent: true,
       };
       const changePasswordCommand = new AdminSetUserPasswordCommand(
         changePasswordParams
       );
-      await cognitoClient.send(changePasswordCommand); // Sending the command to change password
+      await cognitoClient.send(changePasswordCommand);
 
-      // Try to authenticate again with the new password
+      // Authenticate again with the new password
       const finalCommand = new AdminInitiateAuthCommand({
         ...params,
         AuthParameters: {
-          USERNAME: username, // Username
-          PASSWORD: newPassword, // New password
+          USERNAME: username,
+          PASSWORD: newPassword,
         },
       });
-      const finalResponse = await cognitoClient.send(finalCommand); // Sending the command to authenticate again
+      const finalResponse = await cognitoClient.send(finalCommand);
 
-      return finalResponse.AuthenticationResult; // Return the authentication result
+      return finalResponse.AuthenticationResult;
     }
 
-    return response.AuthenticationResult; // Return the authentication result if no new password is required
+    // Return authentication result
+    return response.AuthenticationResult;
   } catch (error) {
-    throw new Error(`Error logging in user: ${error}`); // Handle errors during authentication
+    throw new Error(`Error logging in user: ${error}`);
   }
 };

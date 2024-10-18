@@ -10,35 +10,39 @@ export const authMiddleware = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    // Extracting the token from the authorization header
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
+      // Responding with an error if the token is missing
       res.status(401).json({ message: 'Authorization token is missing' });
       return;
     }
 
+    // Constructing the URL to fetch the JWKS
     const jwksUrl = `https://cognito-idp.${process.env.AWS_REGION}.amazonaws.com/${process.env.COGNITO_USER_POOL_ID}/.well-known/jwks.json`;
     const { data } = await axios.get(jwksUrl);
     const jwk = data.keys[0];
     const pem = jwkToPem(jwk);
 
+    // Verifying the token using the PEM
     jwt.verify(token, pem, { algorithms: ['RS256'] }, (err, decoded) => {
       if (err) {
         return res.status(403).json({ message: 'Token is invalid or expired' });
       }
 
-      // ווידוא שה-decoded אינו מחרוזת
+      // Ensuring that decoded is not a string and contains the expected property
       if (
         typeof decoded !== 'string' &&
         decoded &&
         'cognito:groups' in decoded
       ) {
-        // שימוש ב-any כדי להוסיף את השדה user ל-request
+        // Adding user groups to the request object
         (req as any).user = {
           groups: (decoded as JwtPayload)['cognito:groups'] || [],
         };
       }
 
-      next();
+      next(); // Proceeding to the next middleware or route handler
     });
   } catch (error) {
     res.status(403).json({ message: 'Token is invalid or expired' });

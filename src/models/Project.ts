@@ -1,19 +1,18 @@
-import mongoose, { Document, Schema } from 'mongoose'; // Importing mongoose and its types for creating schemas and documents
+import mongoose, { Document, Schema } from 'mongoose';
 
 // Defining an interface for the Project model that extends mongoose Document
 export interface IProject extends Document {
-  name: string; // Project name
-  description: string; // Project description
+  name: string;
+  description: string;
 }
 
 // Creating a schema for the Project model
 const projectSchema: Schema = new Schema({
-  name: { type: String, required: true }, // Name field, required
-  description: { type: String, required: true }, // Description field, required
+  name: { type: String, required: true },
+  description: { type: String, required: true },
 });
 
 // Creating the Project model using the schema and the IProject interface
 const Project = mongoose.model<IProject>('Project', projectSchema);
 
-// Exporting the Project model for use in other parts of the application
 export default Project;

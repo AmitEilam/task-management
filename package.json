@@ -32,6 +32,7 @@
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "jwk-to-pem": "^2.0.6",
+    "mockingoose": "^2.16.2",
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.1"
   },

@@ -1,30 +1,34 @@
-import express from 'express'; // Importing Express framework
-import bodyParser from 'body-parser'; // Importing body-parser to parse incoming request bodies
-import connectDB from './config/db'; // Importing the database connection function
-import projectRoutes from './routes/projectRoutes'; // Importing project routes
-import taskRoutes from './routes/taskRoutes'; // Importing task routes
-import authRouter from './routes/authRoutes'; // Importing authentication routes
-import dotenv from 'dotenv'; // Importing dotenv to manage environment variables
-import jwt from 'jsonwebtoken'; // Importing jsonwebtoken for token management
+import express from 'express';
+import bodyParser from 'body-parser';
+import connectDB from './config/db';
+import projectRoutes from './routes/projectRoutes';
+import taskRoutes from './routes/taskRoutes';
+import authRouter from './routes/authRoutes';
+import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
 
-dotenv.config(); // Loading environment variables from .env file
-const app = express(); // Creating an Express application
-const PORT = process.env.PORT || 5003; // Setting the port to listen on
-connectDB(); // Connecting to the database
+// Loading environment variables from .env file
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 5003;
+
+// Connecting to the database
+connectDB();
 
 // Middleware to parse JSON bodies
-app.use(bodyParser.json()); // Using body-parser middleware to parse JSON request bodies
+app.use(bodyParser.json());
 
 // Adding the router that handles login
-app.use('/auth', authRouter); // Mounting the auth router on the /auth path
+app.use('/auth', authRouter);
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`); // Logging server start message
+  console.log(`Server is running on port ${PORT}`);
 });
 
 // Mounting the project and task routes
-app.use('/api/projects', projectRoutes); // Mounting project routes on /api/projects path
-app.use('/api/tasks', taskRoutes); // Mounting task routes on /api/tasks path
+app.use('/api/projects', projectRoutes);
+app.use('/api/tasks', taskRoutes);
 
-export default app; // Exporting the app instance for use in other modules
+export default app;
