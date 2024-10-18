@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Task from '../models/Task';
+import Project from '../models/Project';
 
 // Check if the role is admin
 const isAdmin = (req: Request): boolean => {
@@ -13,9 +14,19 @@ export const createTask = async (
 ): Promise<void> => {
   try {
     const { title, description, status, projectId } = req.body;
-    const task = new Task({ title, description, status, projectId });
-    await task.save();
-    res.status(201).json({ message: 'Task created successfully', data: task });
+
+    // Check if the project exists
+    const project = await Project.findById(projectId);
+    if (!project) {
+      // Send a 404 response if the project does not exist
+      res.status(404).json({ message: 'Project not found' });
+    } else {
+      const task = new Task({ title, description, status, projectId });
+      await task.save();
+      res
+        .status(201)
+        .json({ message: 'Task created successfully', data: task });
+    }
   } catch (error) {
     const errorMessage = (error as Error).message || 'Unknown error';
     res

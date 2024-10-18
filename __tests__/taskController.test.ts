@@ -6,16 +6,20 @@ import {
   deleteTask,
 } from '../src/controllers/taskController';
 import Task from '../src/models/Task';
+import Project from '../src/models/Project'; // Importing the Project model
 
-// Mocking the Task model
+// Mocking the Task and Project models
 jest.mock('../src/models/Task');
+jest.mock('../src/models/Project');
 
 describe('Task Controller', () => {
   let mockTask: any;
+  let mockProject: any; // Variable for mocked Project
 
-  // Initialize mockTask before each test
+  // Initialize mocks before each test
   beforeEach(() => {
     mockTask = Task;
+    mockProject = Project; // Assign the mocked Project model
   });
 
   // Clear mocks after each test to ensure a clean state
@@ -39,6 +43,9 @@ describe('Task Controller', () => {
         json: jest.fn(), // Mock json function
       } as any;
 
+      // Mock the findById function to check for the existing project
+      mockProject.findById = jest.fn().mockResolvedValue({ _id: 'project123' });
+
       // Mock the save function to simulate saving a task
       const savedTask = { ...req.body, _id: 'task123' };
       mockTask.prototype.save = jest.fn().mockResolvedValue(savedTask);
@@ -53,12 +60,48 @@ describe('Task Controller', () => {
       });
     });
 
-    it('should return 500 if task creation fails', async () => {
-      const req = { body: {} } as any;
+    it('should return 404 if project does not exist', async () => {
+      const req = {
+        body: {
+          title: 'Test Task',
+          description: 'Test Description',
+          status: 'todo',
+          projectId: 'project123',
+        },
+      } as any;
+
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       } as any;
+
+      // Mock the findById function to simulate a non-existing project
+      mockProject.findById = jest.fn().mockResolvedValue(null);
+
+      await createTask(req, res);
+
+      // Ensure correct response for non-existing project
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Project not found' });
+    });
+
+    it('should return 500 if task creation fails', async () => {
+      const req = {
+        body: {
+          title: 'Test Task',
+          description: 'Test Description',
+          status: 'todo',
+          projectId: 'project123', // Use a valid project ID here for the test
+        },
+      } as any;
+
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as any;
+
+      // Mock the findById function to simulate an existing project
+      mockProject.findById = jest.fn().mockResolvedValue({ _id: 'project123' });
 
       // Simulate an error during task creation
       mockTask.prototype.save = jest
@@ -67,6 +110,7 @@ describe('Task Controller', () => {
 
       await createTask(req, res);
 
+      // Check that the response status is 500 for task creation failure
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         message: 'Error creating task',

@@ -5,7 +5,6 @@ import projectRoutes from './routes/projectRoutes';
 import taskRoutes from './routes/taskRoutes';
 import authRouter from './routes/authRoutes';
 import dotenv from 'dotenv';
-import jwt from 'jsonwebtoken';
 
 // Loading environment variables from .env file
 dotenv.config();
