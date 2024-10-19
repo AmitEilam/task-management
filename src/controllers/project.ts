@@ -1,17 +1,10 @@
 import { Request, Response } from 'express';
 import Project from '../models/Project';
 import Task from '../models/Task';
-
-// Check if the role is admin
-const isAdmin = (req: Request): boolean => {
-  return (req as any).user?.groups?.includes('admin');
-};
+import { isAdmin } from '../utils/isAdmin';
 
 // CREATE a new project (admin only)
-export const createProject = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const create = async (req: Request, res: Response): Promise<void> => {
   if (!isAdmin(req)) {
     res.status(403).json({ message: 'Access denied: Admins only' });
     return;
@@ -33,11 +26,8 @@ export const createProject = async (
   }
 };
 
-// READ ALL projects (admin only)
-export const getAllProjects = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+// READ ALL projects
+export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = (req as any).user.userId;
     const projects = await Project.find({ userId });
@@ -54,16 +44,8 @@ export const getAllProjects = async (
   }
 };
 
-// READ ONE project by ID (admin only)
-export const getProjectById = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  if (!isAdmin(req)) {
-    res.status(403).json({ message: 'Access denied: Admins only' });
-    return;
-  }
-
+// READ ONE project by ID
+export const getById = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = (req as any).user.userId;
     const project = await Project.findOne({ _id: req.params.id, userId });
@@ -81,10 +63,7 @@ export const getProjectById = async (
 };
 
 // UPDATE a project by ID (admin only)
-export const updateProject = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const update = async (req: Request, res: Response): Promise<void> => {
   if (!isAdmin(req)) {
     res.status(403).json({ message: 'Access denied: Admins only' });
     return;
@@ -113,7 +92,7 @@ export const updateProject = async (
 };
 
 // DELETE a project by ID (admin only)
-export const deleteProject = async (
+export const deleteById = async (
   req: Request,
   res: Response
 ): Promise<void> => {

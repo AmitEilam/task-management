@@ -1,10 +1,10 @@
 import {
-  createTask,
-  getAllTasks,
-  getTaskById,
-  updateTask,
-  deleteTask,
-} from '../src/controllers/taskController';
+  create,
+  getAll,
+  getById,
+  update,
+  deleteById,
+} from '../src/controllers/task';
 import Task from '../src/models/Task';
 import Project from '../src/models/Project';
 
@@ -27,7 +27,7 @@ describe('Task Controller', () => {
     jest.clearAllMocks();
   });
 
-  describe('createTask', () => {
+  describe('create', () => {
     it('should create a new task and return 201 status', async () => {
       const req = {
         body: {
@@ -51,7 +51,7 @@ describe('Task Controller', () => {
       const savedTask = { ...req.body, _id: 'task123', userId: 'user123' };
       mockTask.prototype.save = jest.fn().mockResolvedValue(savedTask);
 
-      await createTask(req, res);
+      await create(req, res);
 
       // Ensure correct response status and message
       expect(res.status).toHaveBeenCalledWith(201);
@@ -80,7 +80,7 @@ describe('Task Controller', () => {
       // Mock the findById function to simulate a non-existing project
       mockProject.findById = jest.fn().mockResolvedValue(null);
 
-      await createTask(req, res);
+      await create(req, res);
 
       // Ensure correct response for non-existing project
       expect(res.status).toHaveBeenCalledWith(404);
@@ -111,7 +111,7 @@ describe('Task Controller', () => {
         .fn()
         .mockRejectedValueOnce(new Error('Error'));
 
-      await createTask(req, res);
+      await create(req, res);
 
       // Check that the response status is 500 for task creation failure
       expect(res.status).toHaveBeenCalledWith(500);
@@ -122,7 +122,7 @@ describe('Task Controller', () => {
     });
   });
 
-  describe('getAllTasks', () => {
+  describe('getAll', () => {
     it('should return all tasks associated with the user', async () => {
       const req = {
         user: { userId: 'user123' },
@@ -139,7 +139,7 @@ describe('Task Controller', () => {
       ];
       mockTask.find = jest.fn().mockResolvedValue(tasks);
 
-      await getAllTasks(req, res);
+      await getAll(req, res);
 
       // Verify that the response status and tasks are correct
       expect(res.status).toHaveBeenCalledWith(200);
@@ -158,7 +158,7 @@ describe('Task Controller', () => {
       // Simulate an error when fetching tasks
       mockTask.find = jest.fn().mockRejectedValueOnce(new Error('Error'));
 
-      await getAllTasks(req, res);
+      await getAll(req, res);
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
@@ -183,7 +183,7 @@ describe('Task Controller', () => {
       const task = { title: 'Test Task', userId: 'user123' };
       mockTask.findOne = jest.fn().mockResolvedValue(task);
 
-      await getTaskById(req, res);
+      await getById(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(task);
@@ -202,14 +202,14 @@ describe('Task Controller', () => {
       // Simulate a scenario where the task is not found
       mockTask.findOne = jest.fn().mockResolvedValue(null);
 
-      await getTaskById(req, res);
+      await getById(req, res);
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({ message: 'Task not found' });
     });
   });
 
-  describe('updateTask', () => {
+  describe('update', () => {
     it('should update a task and return 200 status', async () => {
       const req = {
         params: { id: 'task123' },
@@ -230,7 +230,7 @@ describe('Task Controller', () => {
       };
       mockTask.findOneAndUpdate = jest.fn().mockResolvedValue(updatedTask);
 
-      await updateTask(req, res);
+      await update(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
@@ -254,14 +254,14 @@ describe('Task Controller', () => {
       // Simulate a scenario where the task is not found during update
       mockTask.findOneAndUpdate = jest.fn().mockResolvedValue(null);
 
-      await updateTask(req, res);
+      await update(req, res);
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({ message: 'Task not found' });
     });
   });
 
-  describe('deleteTask', () => {
+  describe('deleteById', () => {
     it('should delete a task and return 200 status for admin', async () => {
       const req = {
         params: { id: 'task123' },
@@ -276,7 +276,7 @@ describe('Task Controller', () => {
       // Mock the delete function to simulate successful deletion
       mockTask.findByIdAndDelete = jest.fn().mockResolvedValue(true);
 
-      await deleteTask(req, res);
+      await deleteById(req, res);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
@@ -295,7 +295,7 @@ describe('Task Controller', () => {
         json: jest.fn(),
       } as any;
 
-      await deleteTask(req, res);
+      await deleteById(req, res);
 
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({

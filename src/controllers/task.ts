@@ -1,17 +1,10 @@
 import { Request, Response } from 'express';
 import Task from '../models/Task';
 import Project from '../models/Project';
-
-// Check if the role is admin
-const isAdmin = (req: Request): boolean => {
-  return (req as any).user?.groups?.includes('admin');
-};
+import { isAdmin } from '../utils/isAdmin';
 
 // CREATE a new task (users and admins can create)
-export const createTask = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, description, status, projectId } = req.body;
     const userId = (req as any).user.userId;
@@ -37,10 +30,7 @@ export const createTask = async (
 };
 
 // READ ALL tasks (users and admins can read)
-export const getAllTasks = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = (req as any).user.userId; // Get userId from the request
     const tasks = await Task.find({ userId }); // Fetch tasks associated with the user
@@ -58,10 +48,7 @@ export const getAllTasks = async (
 };
 
 // READ ONE task by ID (users and admins can read)
-export const getTaskById = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getById = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = (req as any).user.userId;
     const task = await Task.findOne({ _id: req.params.id, userId });
@@ -79,10 +66,7 @@ export const getTaskById = async (
 };
 
 // UPDATE a task by ID (users and admins can update)
-export const updateTask = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const update = async (req: Request, res: Response): Promise<void> => {
   try {
     const validStatuses = ['todo', 'in-progress', 'done'];
     const userId = (req as any).user.userId;
@@ -114,7 +98,7 @@ export const updateTask = async (
 };
 
 // DELETE a task by ID (only admins can delete)
-export const deleteTask = async (
+export const deleteById = async (
   req: Request,
   res: Response
 ): Promise<void> => {

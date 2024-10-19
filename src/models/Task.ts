@@ -1,13 +1,5 @@
-import mongoose, { Document, Schema } from 'mongoose';
-
-// Defining an interface for the Task model that extends mongoose Document
-export interface ITask extends Document {
-  title: string;
-  description: string;
-  status: 'todo' | 'in-progress' | 'done';
-  projectId: string;
-  userId: string;
-}
+import mongoose, { Schema } from 'mongoose';
+import { ITask } from '../interfaces/task';
 
 // Creating a schema for the Task model
 const taskSchema: Schema = new Schema({

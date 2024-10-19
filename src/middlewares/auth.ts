@@ -4,7 +4,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import jwkToPem from 'jwk-to-pem';
 import axios from 'axios';
 
-export const authMiddleware = async (
+export const auth = async (
   req: Request,
   res: Response,
   next: NextFunction

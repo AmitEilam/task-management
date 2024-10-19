@@ -1,11 +1,5 @@
-import mongoose, { Document, Schema } from 'mongoose';
-
-// Defining an interface for the Project model that extends mongoose Document
-export interface IProject extends Document {
-  name: string;
-  description: string;
-  userId: string;
-}
+import mongoose, { Schema } from 'mongoose';
+import { IProject } from '../interfaces/project';
 
 // Creating a schema for the Project model
 const projectSchema: Schema = new Schema({

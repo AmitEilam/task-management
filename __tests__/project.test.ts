@@ -1,17 +1,17 @@
 import {
-  createProject,
-  getAllProjects,
-  getProjectById,
-  updateProject,
-  deleteProject,
-} from '../src/controllers/projectController';
+  create,
+  getAll,
+  getById,
+  update,
+  deleteById,
+} from '../src/controllers/project';
 import Project from '../src/models/Project';
 import Task from '../src/models/Task';
 
 // Mocking the Project model
 jest.mock('../src/models/Project');
 
-describe('Project Controller', () => {
+describe('Project', () => {
   let mockProject: any;
 
   // Initialize mockProject before each test
@@ -24,7 +24,7 @@ describe('Project Controller', () => {
     jest.clearAllMocks();
   });
 
-  describe('createProject', () => {
+  describe('create', () => {
     it('should create a new project and return 201 status for admin', async () => {
       const req = {
         body: {
@@ -47,7 +47,7 @@ describe('Project Controller', () => {
       };
       mockProject.prototype.save = jest.fn().mockResolvedValue(savedProject);
 
-      await createProject(req, res);
+      await create(req, res);
 
       // Verify that the response status and message are correct
       expect(res.status).toHaveBeenCalledWith(201);
@@ -71,7 +71,7 @@ describe('Project Controller', () => {
         json: jest.fn(),
       } as any;
 
-      await createProject(req, res);
+      await create(req, res);
 
       // Verify that the response status and message are correct for non-admin
       expect(res.status).toHaveBeenCalledWith(403);
@@ -99,7 +99,7 @@ describe('Project Controller', () => {
         .fn()
         .mockRejectedValueOnce(new Error('Error'));
 
-      await createProject(req, res);
+      await create(req, res);
 
       // Verify that the response status and error message are correct
       expect(res.status).toHaveBeenCalledWith(500);
@@ -110,7 +110,7 @@ describe('Project Controller', () => {
     });
   });
 
-  describe('getAllProjects', () => {
+  describe('getAll', () => {
     it('should return all projects associated with the user', async () => {
       const req = {
         user: { groups: ['admin'], userId: 'user123' },
@@ -132,7 +132,7 @@ describe('Project Controller', () => {
           projects.filter((p) => p.userId === req.user.userId)
         );
 
-      await getAllProjects(req, res);
+      await getAll(req, res);
 
       // Verify that the response status and projects are correct
       expect(res.status).toHaveBeenCalledWith(200);
@@ -149,7 +149,7 @@ describe('Project Controller', () => {
       // Simulate an error when fetching projects
       mockProject.find = jest.fn().mockRejectedValueOnce(new Error('Error'));
 
-      await getAllProjects(req, res);
+      await getAll(req, res);
 
       // Verify that the response status and error message are correct
       expect(res.status).toHaveBeenCalledWith(500);
@@ -160,7 +160,7 @@ describe('Project Controller', () => {
     });
   });
 
-  describe('getProjectById', () => {
+  describe('getById', () => {
     it('should return a project associated with the user', async () => {
       const req = {
         params: { id: 'project123' },
@@ -174,30 +174,11 @@ describe('Project Controller', () => {
       const project = { name: 'Test Project', userId: 'user123' };
       mockProject.findOne = jest.fn().mockResolvedValue(project);
 
-      await getProjectById(req, res);
+      await getById(req, res);
 
       // Verify that the response status and project data are correct
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(project);
-    });
-
-    it('should return 403 if user is not admin', async () => {
-      const req = {
-        params: { id: 'project123' },
-        user: { groups: ['user'], userId: 'user123' },
-      } as any;
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as any;
-
-      await getProjectById(req, res);
-
-      // Verify that the response status and message are correct for non-admin
-      expect(res.status).toHaveBeenCalledWith(403);
-      expect(res.json).toHaveBeenCalledWith({
-        message: 'Access denied: Admins only',
-      });
     });
 
     it('should return 404 if project not found', async () => {
@@ -212,7 +193,7 @@ describe('Project Controller', () => {
 
       mockProject.findOne = jest.fn().mockResolvedValue(null);
 
-      await getProjectById(req, res);
+      await getById(req, res);
 
       // Verify that the response status and message are correct for not found
       expect(res.status).toHaveBeenCalledWith(404);
@@ -220,7 +201,7 @@ describe('Project Controller', () => {
     });
   });
 
-  describe('updateProject', () => {
+  describe('update', () => {
     it('should update a project and return 200 status for admin', async () => {
       const req = {
         params: { id: 'project123' },
@@ -238,7 +219,7 @@ describe('Project Controller', () => {
         .fn()
         .mockResolvedValue(updatedProject);
 
-      await updateProject(req, res);
+      await update(req, res);
 
       // Verify that the response status and updated project data are correct
       expect(res.status).toHaveBeenCalledWith(200);
@@ -260,7 +241,7 @@ describe('Project Controller', () => {
         json: jest.fn(),
       } as any;
 
-      await updateProject(req, res);
+      await update(req, res);
 
       // Verify that the response status and message are correct for non-admin
       expect(res.status).toHaveBeenCalledWith(403);
@@ -283,7 +264,7 @@ describe('Project Controller', () => {
 
       mockProject.findOneAndUpdate = jest.fn().mockResolvedValue(null);
 
-      await updateProject(req, res);
+      await update(req, res);
 
       // Verify that the response status and message are correct for not found
       expect(res.status).toHaveBeenCalledWith(404);
@@ -291,7 +272,7 @@ describe('Project Controller', () => {
     });
   });
 
-  describe('deleteProject', () => {
+  describe('deleteById', () => {
     it('should delete a project and return 200 status for admin', async () => {
       const req = {
         params: { id: 'project123' },
@@ -311,7 +292,7 @@ describe('Project Controller', () => {
       // Mock the deleteMany function to simulate successful deletion of related tasks
       Task.deleteMany = jest.fn().mockResolvedValue({ deletedCount: 1 });
 
-      await deleteProject(req, res);
+      await deleteById(req, res);
 
       // Verify that the response status and deletion message are correct
       expect(res.status).toHaveBeenCalledWith(200);
@@ -331,7 +312,7 @@ describe('Project Controller', () => {
         json: jest.fn(),
       } as any;
 
-      await deleteProject(req, res);
+      await deleteById(req, res);
 
       // Verify that the response status and message are correct for non-admin
       expect(res.status).toHaveBeenCalledWith(403);
@@ -354,7 +335,7 @@ describe('Project Controller', () => {
       // Simulate a scenario where the project is not found
       mockProject.findOneAndDelete = jest.fn().mockResolvedValue(null);
 
-      await deleteProject(req, res);
+      await deleteById(req, res);
 
       // Verify that the response status and message are correct for not found
       expect(res.status).toHaveBeenCalledWith(404);
