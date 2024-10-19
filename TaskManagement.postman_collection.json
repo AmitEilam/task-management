@@ -10,7 +10,7 @@
 			"name": "Projects",
 			"item": [
 				{
-					"name": "CreateProject",
+					"name": "Create",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -60,7 +60,7 @@
 					"response": []
 				},
 				{
-					"name": "GetProjects",
+					"name": "GetAll",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -98,7 +98,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5003/api/projects",
+							"raw": "http://localhost:5003/api/projects?page=1&limit=1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -107,13 +107,23 @@
 							"path": [
 								"api",
 								"projects"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "1"
+								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "GetProjectsById",
+					"name": "GetById",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -151,7 +161,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5003/api/projects/671258d7c82bf88deeb42b76",
+							"raw": "http://localhost:5003/api/projects/67127e37729efe75eaeaf286",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -160,14 +170,14 @@
 							"path": [
 								"api",
 								"projects",
-								"671258d7c82bf88deeb42b76"
+								"67127e37729efe75eaeaf286"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "UpdateProjectById",
+					"name": "UpdateById",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -202,7 +212,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5003/api/projects/671258d7c82bf88deeb42b76",
+							"raw": "http://localhost:5003/api/projects/67127e37729efe75eaeaf286",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -211,14 +221,14 @@
 							"path": [
 								"api",
 								"projects",
-								"671258d7c82bf88deeb42b76"
+								"67127e37729efe75eaeaf286"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "DeleteProjectsById",
+					"name": "DeleteById",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -253,7 +263,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5003/api/projects/671258d7c82bf88deeb42b76",
+							"raw": "http://localhost:5003/api/projects/67127e37729efe75eaeaf286",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -262,7 +272,7 @@
 							"path": [
 								"api",
 								"projects",
-								"671258d7c82bf88deeb42b76"
+								"67127e37729efe75eaeaf286"
 							]
 						}
 					},
@@ -274,7 +284,7 @@
 			"name": "Tasks",
 			"item": [
 				{
-					"name": "CreateTask",
+					"name": "Create",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -301,7 +311,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"My First Task 1\",\n    \"description\": \"This is a test task 1\",\n    \"status\":\"todo\",\n    \"projectId\":\"67125994ab110de347ca0bb\"\n}",
+							"raw": "{\n    \"title\": \"My First user Task 3\",\n    \"description\": \"This is a test task user 3\",\n    \"status\":\"todo\",\n    \"projectId\":\"67127f89be86b077622284c7\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -324,7 +334,7 @@
 					"response": []
 				},
 				{
-					"name": "GetTasks",
+					"name": "GetAll",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -362,7 +372,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5003/api/tasks",
+							"raw": "http://localhost:5003/api/tasks?page=1&limit=2",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -371,13 +381,23 @@
 							"path": [
 								"api",
 								"tasks"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "2"
+								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "GetTaskById",
+					"name": "GetById",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -415,7 +435,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5003/api/tasks/671145ba22df7d29305bd646",
+							"raw": "http://localhost:5003/api/tasks/67135aceaabf67b39dd417f1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -424,14 +444,14 @@
 							"path": [
 								"api",
 								"tasks",
-								"671145ba22df7d29305bd646"
+								"67135aceaabf67b39dd417f1"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "UpdateTasksById",
+					"name": "UpdateById",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -458,7 +478,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Project1 Task1\",\n    \"description\": \"This is task 1 for project 1\",\n    \"status\":\"done\"\n}",
+							"raw": "{\n    \"title\": \"Project1 Task12\",\n    \"description\": \"This is task 1 for project 12\",\n    \"status\":\"done\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -466,7 +486,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5003/api/tasks/671145ba22df7d29305bd646",
+							"raw": "http://localhost:5003/api/tasks/67135aceaabf67b39dd417f1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -475,14 +495,14 @@
 							"path": [
 								"api",
 								"tasks",
-								"671145ba22df7d29305bd646"
+								"67135aceaabf67b39dd417f1"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "DeleteTasksById",
+					"name": "DeleteById",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -517,7 +537,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:5003/api/tasks/671257b1c6a2d12fa8383531",
+							"raw": "http://localhost:5003/api/tasks/67135aceaabf67b39dd417f1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -526,7 +546,7 @@
 							"path": [
 								"api",
 								"tasks",
-								"671257b1c6a2d12fa8383531"
+								"67135aceaabf67b39dd417f1"
 							]
 						}
 					},
