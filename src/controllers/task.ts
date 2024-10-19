@@ -34,20 +34,32 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = (req as any).user.userId;
 
-    // pagination
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-    const skip = (page - 1) * limit;
-    const tasks = await Task.find({ userId }).skip(skip).limit(limit);
+    // pagination - check if page and limit are provided
+    const page = req.query.page ? parseInt(req.query.page as string) : null;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : null;
+
+    // Start the query to fetch tasks
+    let tasksQuery = Task.find({ userId });
+
+    // Apply pagination only if both page and limit are provided
+    if (page !== null && limit !== null) {
+      const skip = (page - 1) * limit;
+      tasksQuery = tasksQuery.skip(skip).limit(limit);
+    }
+
+    // Execute the query
+    const tasks = await tasksQuery;
+
+    // Count total tasks
     const totalTasks = await Task.countDocuments({ userId });
 
     if (tasks.length === 0) {
       res.status(404).json({ message: 'No tasks found' });
     } else {
       res.status(200).json({
-        page,
-        limit,
-        totalPages: Math.ceil(totalTasks / limit),
+        page: page || 'all', // Indicate that all tasks are returned if no pagination
+        limit: limit || 'all', // Same for limit
+        totalPages: limit ? Math.ceil(totalTasks / limit) : 1, // Calculate total pages if pagination applied
         totalTasks,
         tasks,
       });
