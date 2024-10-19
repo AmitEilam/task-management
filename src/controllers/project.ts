@@ -131,7 +131,7 @@ export const deleteById = async (
     const project = await Project.findOneAndDelete({
       _id: req.params.id,
       userId,
-    }); // Find and delete the project by ID and userId
+    });
     if (!project) {
       res.status(404).json({ message: 'Project not found' });
     } else {

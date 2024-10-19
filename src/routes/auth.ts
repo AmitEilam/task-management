@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { loginUser } from '../services/authService';
 
-const router = express.Router(); // Creating an Express router
+const router = express.Router();
 
 // Handling POST requests to the /login endpoint
 router.post('/login', async (req: Request, res: Response) => {
