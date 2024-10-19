@@ -29,15 +29,28 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// READ ALL tasks (users and admins can read)
+// READ ALL tasks with pagination (users and admins can read)
 export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = (req as any).user.userId; // Get userId from the request
-    const tasks = await Task.find({ userId }); // Fetch tasks associated with the user
+    const userId = (req as any).user.userId;
+
+    // pagination
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+    const tasks = await Task.find({ userId }).skip(skip).limit(limit);
+    const totalTasks = await Task.countDocuments({ userId });
+
     if (tasks.length === 0) {
       res.status(404).json({ message: 'No tasks found' });
     } else {
-      res.status(200).json(tasks);
+      res.status(200).json({
+        page,
+        limit,
+        totalPages: Math.ceil(totalTasks / limit),
+        totalTasks,
+        tasks,
+      });
     }
   } catch (error) {
     const errorMessage = (error as Error).message || 'Unknown error';

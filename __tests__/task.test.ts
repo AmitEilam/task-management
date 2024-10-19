@@ -123,48 +123,78 @@ describe('Task Controller', () => {
   });
 
   describe('getAll', () => {
-    it('should return all tasks associated with the user', async () => {
+    it('should return paginated tasks associated with the user', async () => {
       const req = {
+        query: { page: '1', limit: '2' },
         user: { userId: 'user123' },
       } as any;
+
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       } as any;
 
-      // Mock the response to return a list of tasks for the user
+      // Mock the response to return paginated tasks for the user
       const tasks = [
         { title: 'Task 1', userId: 'user123' },
         { title: 'Task 2', userId: 'user123' },
       ];
-      mockTask.find = jest.fn().mockResolvedValue(tasks);
+
+      // Mock the Task model's find, skip, limit, and countDocuments functions
+      const skipMock = jest.fn().mockReturnThis();
+      const limitMock = jest.fn().mockResolvedValue(tasks);
+      mockTask.find = jest.fn().mockReturnValue({
+        skip: skipMock,
+        limit: limitMock,
+      });
+
+      mockTask.countDocuments = jest.fn().mockResolvedValue(4);
 
       await getAll(req, res);
 
-      // Verify that the response status and tasks are correct
+      // Validate the response
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(tasks);
+      expect(res.json).toHaveBeenCalledWith({
+        page: 1,
+        limit: 2,
+        totalPages: 2,
+        totalTasks: 4,
+        tasks,
+      });
+
+      // Validate that the mocks were called correctly
+      expect(mockTask.find).toHaveBeenCalledWith({ userId: 'user123' });
+      expect(skipMock).toHaveBeenCalledWith(0);
+      expect(limitMock).toHaveBeenCalledWith(2);
+      expect(mockTask.countDocuments).toHaveBeenCalledWith({
+        userId: 'user123',
+      });
     });
 
-    it('should return 500 if fetching tasks fails', async () => {
+    it('should return 404 if no tasks are found', async () => {
       const req = {
+        query: { page: '1', limit: '2' },
         user: { userId: 'user123' },
       } as any;
+
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       } as any;
 
-      // Simulate an error when fetching tasks
-      mockTask.find = jest.fn().mockRejectedValueOnce(new Error('Error'));
+      // Mock the response to return an empty list of tasks
+      mockTask.find = jest.fn().mockReturnValue({
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockResolvedValue([]), // No tasks
+      });
+
+      mockTask.countDocuments = jest.fn().mockResolvedValue(0); // No tasks in total
 
       await getAll(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        message: 'Error fetching tasks',
-        error: 'Error',
-      });
+      // Validate that the response status and message are correct for no tasks
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ message: 'No tasks found' });
     });
   });
 

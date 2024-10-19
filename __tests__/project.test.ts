@@ -111,8 +111,9 @@ describe('Project', () => {
   });
 
   describe('getAll', () => {
-    it('should return all projects associated with the user', async () => {
+    it('should return paginated projects associated with the user', async () => {
       const req = {
+        query: { page: '1', limit: '2' },
         user: { groups: ['admin'], userId: 'user123' },
       } as any;
 
@@ -121,42 +122,66 @@ describe('Project', () => {
         json: jest.fn(),
       } as any;
 
-      // Mock the response to return a list of projects for the user
+      // Mock the response to return paginated projects for the user
       const projects = [
         { name: 'Project 1', userId: 'user123' },
         { name: 'Project 2', userId: 'user123' },
       ];
-      mockProject.find = jest
-        .fn()
-        .mockResolvedValue(
-          projects.filter((p) => p.userId === req.user.userId)
-        );
+
+      const skipMock = jest.fn().mockReturnThis();
+      const limitMock = jest.fn().mockResolvedValue(projects);
+      mockProject.find = jest.fn().mockReturnValue({
+        skip: skipMock,
+        limit: limitMock,
+      });
+
+      mockProject.countDocuments = jest.fn().mockResolvedValue(4);
 
       await getAll(req, res);
 
-      // Verify that the response status and projects are correct
+      // Validate the response
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(projects);
+      expect(res.json).toHaveBeenCalledWith({
+        page: 1,
+        limit: 2,
+        totalPages: 2,
+        totalProjects: 4,
+        projects,
+      });
+
+      // Validate that the mocks were called correctly
+      expect(mockProject.find).toHaveBeenCalledWith({ userId: 'user123' });
+      expect(skipMock).toHaveBeenCalledWith(0); // skip = (page - 1) * limit
+      expect(limitMock).toHaveBeenCalledWith(2); // limit = 2
+      expect(mockProject.countDocuments).toHaveBeenCalledWith({
+        userId: 'user123',
+      });
     });
 
-    it('should return 500 if fetching projects fails', async () => {
-      const req = { user: { groups: ['admin'], userId: 'user123' } } as any;
+    it('should return 404 if no projects are found', async () => {
+      const req = {
+        query: { page: '1', limit: '2' },
+        user: { groups: ['admin'], userId: 'user123' },
+      } as any;
+
       const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
       } as any;
 
-      // Simulate an error when fetching projects
-      mockProject.find = jest.fn().mockRejectedValueOnce(new Error('Error'));
+      // Mock the response to return an empty list of projects
+      mockProject.find = jest.fn().mockReturnValue({
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockResolvedValue([]),
+      });
+
+      mockProject.countDocuments = jest.fn().mockResolvedValue(0);
 
       await getAll(req, res);
 
-      // Verify that the response status and error message are correct
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        message: 'Error fetching projects',
-        error: 'Error',
-      });
+      // Validate that the response status and message are correct for no projects
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ message: 'No projects found' });
     });
   });
 

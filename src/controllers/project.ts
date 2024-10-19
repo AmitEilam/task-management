@@ -26,15 +26,28 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// READ ALL projects
+// READ ALL projects with pagination
 export const getAll = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = (req as any).user.userId;
-    const projects = await Project.find({ userId });
+
+    // pagination
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+    const projects = await Project.find({ userId }).skip(skip).limit(limit);
+    const totalProjects = await Project.countDocuments({ userId });
+
     if (projects.length === 0) {
       res.status(404).json({ message: 'No projects found' });
     } else {
-      res.status(200).json(projects);
+      res.status(200).json({
+        page,
+        limit,
+        totalPages: Math.ceil(totalProjects / limit),
+        totalProjects,
+        projects,
+      });
     }
   } catch (error) {
     const errorMessage = (error as Error).message || 'Unknown error';
